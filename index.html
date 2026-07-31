@@ -278,11 +278,11 @@
       }
     }
 
+    /* Don't kill .love-x / .love-y — Reduce Motion was collapsing the heart into one word */
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
+      .grow, .leaf, .flower, .vase, .eyebrow, .caption, .bouquet-stage, .scroll-cue span {
+        animation: none !important;
+        transition: none !important;
       }
 
       .grow { stroke-dashoffset: 0; }
