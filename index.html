@@ -225,8 +225,9 @@
 
     .heart-stage {
       --s: 0.7;
-      width: calc(450px * var(--s));
-      height: calc(450px * var(--s));
+      --size: 450px;
+      width: calc(var(--size) * var(--s));
+      height: calc(var(--size) * var(--s));
       position: relative;
       flex-shrink: 0;
     }
@@ -235,30 +236,30 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 450px;
-      height: 450px;
-      margin: -225px 0 0 -225px;
+      width: var(--size);
+      height: var(--size);
+      margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
       transform: scale(var(--s));
       transform-origin: center;
     }
 
     .love {
-      --i: 1;
+      --delay: calc(var(--i) * -0.3s);
       position: absolute;
       top: 50%;
       left: 50%;
-      margin: -225px 0 0 -225px;
+      margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
       pointer-events: none;
     }
 
     .love-x {
       animation: love-x 10s infinite alternate ease-in-out;
-      animation-delay: calc(var(--i) * -0.3s);
+      animation-delay: var(--delay);
     }
 
     .love-y {
       animation: love-y 20s infinite linear;
-      animation-delay: calc(var(--i) * -0.3s);
+      animation-delay: var(--delay);
     }
 
     .love-word {
@@ -278,17 +279,11 @@
       }
     }
 
-    /* Don't kill .love-x / .love-y — Reduce Motion was collapsing the heart into one word */
+    /* Only mute looping motion; keep bloom / grow entrances (and the heart ribbon) */
     @media (prefers-reduced-motion: reduce) {
-      .grow, .leaf, .flower, .vase, .eyebrow, .caption, .bouquet-stage, .scroll-cue span {
+      .bouquet-stage,
+      .scroll-cue span {
         animation: none !important;
-        transition: none !important;
-      }
-
-      .grow { stroke-dashoffset: 0; }
-      .leaf, .flower, .vase, .eyebrow, .caption {
-        opacity: 1;
-        transform: none;
       }
     }
   </style>
@@ -445,12 +440,13 @@
       frame.appendChild(frag);
 
       function fitHeart() {
-        const pad = 24;
+        const size =
+          parseFloat(getComputedStyle(stage).getPropertyValue("--size")) || 450;
         const avail = Math.min(
-          window.innerWidth - pad,
+          window.innerWidth - 24,
           window.innerHeight * 0.85
         );
-        stage.style.setProperty("--s", String(Math.min(1, avail / 450)));
+        stage.style.setProperty("--s", String(Math.min(1, avail / size)));
       }
 
       fitHeart();
