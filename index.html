@@ -67,7 +67,7 @@
       50% { transform: translateY(6px); opacity: 1; }
     }
 
-    /* Ribbon path: love-y period must stay 26s (2× love-x) */
+    /* Classic codingstella ribbon path — X must be ease-in-out, Y linear, Y = 2× X */
     @keyframes love-x {
       from { transform: translateX(0); }
       to { transform: translateX(450px); }
@@ -209,61 +209,56 @@
       animation: nudge 2.4s ease-in-out infinite;
     }
 
-    /* —— Heart (ribbon animation) —— */
+    /* —— Heart (codingstella ribbon) —— */
     .heart-section {
       min-height: 100svh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding:
-        max(16px, env(safe-area-inset-top))
-        max(16px, env(safe-area-inset-right))
-        max(16px, env(safe-area-inset-bottom))
-        max(16px, env(safe-area-inset-left));
+        max(12px, env(safe-area-inset-top))
+        max(8px, env(safe-area-inset-right))
+        max(12px, env(safe-area-inset-bottom))
+        max(8px, env(safe-area-inset-left));
       overflow: hidden;
     }
 
     .heart-stage {
-      --s: 0.65;
-      --bleed: 1.28;
-      --heart-size: 450px;
-      --nudge-x: -10%;
-      width: calc(var(--heart-size) * var(--s) * var(--bleed));
-      height: calc(var(--heart-size) * var(--s) * var(--bleed));
-      max-width: calc(100vw - 16px);
-      max-height: 85svh;
+      --s: 0.7;
+      width: calc(450px * var(--s));
+      height: calc(450px * var(--s));
       position: relative;
-      display: grid;
-      place-items: center;
       flex-shrink: 0;
     }
 
     .heart-frame {
-      width: var(--heart-size);
-      height: var(--heart-size);
-      position: relative;
-      transform: translateX(var(--nudge-x)) scale(var(--s));
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 450px;
+      height: 450px;
+      margin: -225px 0 0 -225px;
+      transform: scale(var(--s));
       transform-origin: center;
     }
 
     .love {
+      --i: 1;
       position: absolute;
       top: 50%;
       left: 50%;
-      margin: calc(var(--heart-size) / -2) 0 0 calc(var(--heart-size) / -2);
+      margin: -225px 0 0 -225px;
       pointer-events: none;
     }
 
     .love-x {
-      animation: love-x 13s infinite alternate linear;
-      animation-delay: var(--delay);
-      animation-fill-mode: both;
+      animation: love-x 10s infinite alternate ease-in-out;
+      animation-delay: calc(var(--i) * -0.3s);
     }
 
     .love-y {
-      animation: love-y 26s infinite linear;
-      animation-delay: var(--delay);
-      animation-fill-mode: both;
+      animation: love-y 20s infinite linear;
+      animation-delay: calc(var(--i) * -0.3s);
     }
 
     .love-word {
@@ -273,12 +268,12 @@
       letter-spacing: 2px;
       white-space: nowrap;
       text-shadow: 0 0 10px #fff;
-      transform: translateY(-100%) rotateZ(-30deg);
+      transform: translateY(-100%) rotate(-30deg);
     }
 
     @media (max-width: 480px) {
       .love-word {
-        font-size: 1.2rem;
+        font-size: 1.05rem;
         letter-spacing: 1px;
       }
     }
@@ -291,7 +286,7 @@
       }
 
       .grow { stroke-dashoffset: 0; }
-      .leaf, .flower, .vase, .eyebrow, .caption, .heart-stage {
+      .leaf, .flower, .vase, .eyebrow, .caption {
         opacity: 1;
         transform: none;
       }
@@ -435,46 +430,27 @@
       const frame = document.getElementById("heart-frame");
       if (!stage || !frame) return;
 
-      /* Even stagger across the full 26s path so the heart is complete immediately */
-      const count = window.innerWidth <= 480 ? 120 : 140;
-      const period = 26;
+      const count = 100;
       const frag = document.createDocumentFragment();
 
-      for (let i = 0; i < count; i++) {
+      for (let i = 1; i <= count; i++) {
         const love = document.createElement("div");
         love.className = "love";
-        love.style.setProperty("--delay", `${-((i / count) * period)}s`);
-
-        const x = document.createElement("div");
-        x.className = "love-x";
-        const y = document.createElement("div");
-        y.className = "love-y";
-        const word = document.createElement("div");
-        word.className = "love-word";
-        word.textContent = "I love you";
-
-        y.appendChild(word);
-        x.appendChild(y);
-        love.appendChild(x);
+        love.style.setProperty("--i", String(i));
+        love.innerHTML =
+          '<div class="love-x"><div class="love-y"><div class="love-word">I love you</div></div></div>';
         frag.appendChild(love);
       }
 
       frame.appendChild(frag);
 
       function fitHeart() {
-        const bleed = window.innerWidth <= 480 ? 1.28 : 1.2;
-        const size =
-          parseFloat(getComputedStyle(stage).getPropertyValue("--heart-size")) ||
-          450;
+        const pad = 24;
         const avail = Math.min(
-          window.innerWidth - 20,
-          window.innerHeight * 0.82
+          window.innerWidth - pad,
+          window.innerHeight * 0.85
         );
-        stage.style.setProperty("--bleed", String(bleed));
-        stage.style.setProperty(
-          "--s",
-          String(Math.min(1, avail / (size * bleed)))
-        );
+        stage.style.setProperty("--s", String(Math.min(1, avail / 450)));
       }
 
       fitHeart();
