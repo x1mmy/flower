@@ -67,6 +67,7 @@
       50% { transform: translateY(6px); opacity: 1; }
     }
 
+    /* Ribbon path: love-y period must stay 26s (2× love-x) */
     @keyframes love-x {
       from { transform: translateX(0); }
       to { transform: translateX(450px); }
@@ -246,7 +247,6 @@
     }
 
     .love {
-      --delay: calc(var(--i) * -300ms);
       position: absolute;
       top: 50%;
       left: 50%;
@@ -255,13 +255,15 @@
     }
 
     .love-x {
-      animation: love-x 13s infinite alternate ease-in-out;
+      animation: love-x 13s infinite alternate linear;
       animation-delay: var(--delay);
+      animation-fill-mode: both;
     }
 
     .love-y {
       animation: love-y 26s infinite linear;
       animation-delay: var(--delay);
+      animation-fill-mode: both;
     }
 
     .love-word {
@@ -433,13 +435,15 @@
       const frame = document.getElementById("heart-frame");
       if (!stage || !frame) return;
 
-      const count = window.innerWidth <= 480 ? 72 : 100;
+      /* Even stagger across the full 26s path so the heart is complete immediately */
+      const count = window.innerWidth <= 480 ? 120 : 140;
+      const period = 26;
       const frag = document.createDocumentFragment();
 
-      for (let i = 1; i <= count; i++) {
+      for (let i = 0; i < count; i++) {
         const love = document.createElement("div");
         love.className = "love";
-        love.style.setProperty("--i", String(i));
+        love.style.setProperty("--delay", `${-((i / count) * period)}s`);
 
         const x = document.createElement("div");
         x.className = "love-x";
